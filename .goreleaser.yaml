@@ -1,0 +1,204 @@
+# GoReleaser config for bdv. Docs: https://goreleaser.com
+# Local check:     go run github.com/goreleaser/goreleaser/v2@latest check
+# Local dry run:   go run github.com/goreleaser/goreleaser/v2@latest release --snapshot --clean --skip=publish
+# Real releases run from .github/workflows/release.yml on a pushed v* tag.
+version: 2
+
+project_name: bdv
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - id: bdv
+    main: .
+    binary: bdv
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}}
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: bdv
+    ids: [bdv]
+    formats: [tar.gz]
+    # bdv_0.1.0_darwin_arm64.tar.gz, bdv_0.1.0_windows_amd64.zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README*
+      - LICENSE
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  use: git
+  sort: asc
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]-]+\))??!?:.+$'
+      order: 0
+    - title: Bug fixes
+      regexp: '^.*?fix(\([[:word:]-]+\))??!?:.+$'
+      order: 1
+    - title: Documentation
+      regexp: '^.*?docs(\([[:word:]-]+\))??!?:.+$'
+      order: 2
+    - title: Other
+      order: 999
+  filters:
+    exclude:
+      - '^test(\(.+\))?:'
+      - '^ci(\(.+\))?:'
+      - '^chore(\(.+\))?:'
+      - "^Merge "
+
+nfpms:
+  - id: bdv
+    ids: [bdv]
+    package_name: bdv
+    # bdv_0.1.0_amd64.deb, bdv-0.1.0-1.x86_64.rpm, bdv_0.1.0_x86_64.apk
+    file_name_template: "{{ .ConventionalFileName }}"
+    vendor: nizom333
+    homepage: https://github.com/nizom333/bdv
+    maintainer: "nizom333 <nizom333@users.noreply.github.com>"
+    description: |-
+      Fast terminal UI viewer for the bd (beads) issue tracker.
+      Shows the task tree, priority groups, specs, decisions, memory and
+      formulas of a beads project. Requires bd (beads) in PATH.
+    license: MIT
+    section: utils
+    formats:
+      - deb
+      - rpm
+      - apk
+    bindir: /usr/bin
+    contents:
+      - src: README.md
+        dst: /usr/share/doc/bdv/README.md
+      - src: LICENSE
+        dst: /usr/share/doc/bdv/LICENSE
+
+# Homebrew: a Cask, not a Formula. `brews` (pre-built binaries in a Formula) is
+# fully deprecated since GoReleaser v2.16; Casks are Homebrew's mechanism for
+# pre-built binaries and work on macOS and Linux. Install with
+#   brew install nizom333/tap/bdv
+homebrew_casks:
+  - name: bdv
+    ids: [bdv]
+    binaries: [bdv]
+    directory: Casks
+    homepage: https://github.com/nizom333/bdv
+    description: Fast terminal UI viewer for the bd (beads) issue tracker
+    license: MIT
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: "bdv {{ .Tag }}"
+    caveats: |
+      bdv is a viewer for the bd (beads) issue tracker and needs `bd` in your PATH.
+      Install beads first: https://github.com/steveyegge/beads
+    hooks:
+      post:
+        # The binary is not signed or notarized: drop the quarantine flag so
+        # macOS Gatekeeper does not block it. No-op on Linux.
+        install_steps: |
+          on_macos do
+            run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{ .StagedPath }}/bdv"]
+          end
+    repository:
+      owner: nizom333
+      name: homebrew-tap
+      branch: main
+      git:
+        url: git@github.com:nizom333/homebrew-tap.git
+        private_key: "{{ .Env.TAP_DEPLOY_KEY }}"
+
+scoops:
+  - name: bdv
+    ids: [bdv]
+    directory: bucket
+    homepage: https://github.com/nizom333/bdv
+    description: Fast terminal UI viewer for the bd (beads) issue tracker
+    license: MIT
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: "bdv {{ .Tag }} (scoop)"
+    repository:
+      owner: nizom333
+      name: homebrew-tap
+      branch: main
+      git:
+        url: git@github.com:nizom333/homebrew-tap.git
+        private_key: "{{ .Env.TAP_DEPLOY_KEY }}"
+
+# AUR: bdv-bin. Skipped while the AUR_KEY secret is not set.
+aurs:
+  - name: bdv-bin
+    ids: [bdv]
+    homepage: https://github.com/nizom333/bdv
+    description: Fast terminal UI viewer for the bd (beads) issue tracker
+    maintainers:
+      - "nizom333 <nizom333 at users dot noreply dot github dot com>"
+    license: MIT
+    provides: [bdv]
+    conflicts: [bdv]
+    private_key: '{{ envOrDefault "AUR_KEY" "" }}'
+    git_url: "ssh://aur@aur.archlinux.org/bdv-bin.git"
+    # В GitHub Actions отсутствующий секрет приходит пустой строкой, а не
+    # отсутствующей переменной, поэтому проверяем значение, а не isEnvSet.
+    skip_upload: '{{ if envOrDefault "AUR_KEY" "" }}false{{ else }}true{{ end }}'
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    package: |-
+      install -Dm755 "./bdv" "${pkgdir}/usr/bin/bdv"
+      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/bdv/LICENSE"
+      install -Dm644 "./README.md" "${pkgdir}/usr/share/doc/bdv/README.md"
+
+release:
+  github:
+    owner: nizom333
+    name: bdv
+  draft: false
+  prerelease: auto
+  mode: replace
+  # A re-run of a failed release job overwrites the assets it already uploaded.
+  replace_existing_artifacts: true
+  header: |
+    bdv {{ .Tag }} — fast terminal UI viewer for the [bd (beads)](https://github.com/steveyegge/beads) issue tracker. bdv needs `bd` in your `PATH`.
+
+    ## Install
+
+    ```sh
+    # Homebrew (macOS, Linux)
+    brew install nizom333/tap/bdv
+
+    # Scoop (Windows)
+    scoop bucket add nizom333 https://github.com/nizom333/homebrew-tap
+    scoop install nizom333/bdv
+
+    # Go
+    go install github.com/nizom333/bdv@{{ .Tag }}
+    ```
+
+    Debian/Ubuntu: `sudo apt install ./bdv_{{ .Version }}_amd64.deb` · Fedora/RHEL: `sudo dnf install ./bdv-{{ .Version }}-1.x86_64.rpm` · Alpine: `sudo apk add --allow-untrusted ./bdv_{{ .Version }}_x86_64.apk`. Archives for macOS, Linux and Windows (amd64, arm64) are below; verify them with `checksums.txt`.
