@@ -53,3 +53,7 @@ go run github.com/goreleaser/goreleaser/v2@latest check
 go run github.com/goreleaser/goreleaser/v2@latest release --snapshot --clean --skip=publish
 rm -rf dist
 ```
+
+## Statistics
+
+`.github/workflows/stats.yml` runs weekly (and on demand: `gh workflow run stats -R nizom333/bdv`) and appends stars, forks, release downloads and traffic to the [`stats`](https://github.com/nizom333/bdv/tree/stats) branch, because GitHub keeps traffic for only 14 days. Summary: [`STATS.md`](https://github.com/nizom333/bdv/blob/stats/STATS.md). Traffic needs the `STATS_TOKEN` secret (a fine-grained token for this repository with `Administration: read`).
