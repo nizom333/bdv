@@ -75,6 +75,14 @@ scoop bucket add nizom333 https://github.com/nizom333/homebrew-tap
 scoop install nizom333/bdv
 ```
 
+### winget (Windows)
+
+```powershell
+winget install nizom333.bdv
+```
+
+Submitted to the winget community repository ([microsoft/winget-pkgs#489168](https://github.com/microsoft/winget-pkgs/pull/489168)); available once it is merged. Until then, use Scoop.
+
 ### Debian, Ubuntu, Fedora, RHEL, Alpine
 
 Download the package for your system from the [latest release](https://github.com/nizom333/bdv/releases/latest). Asset names (`VERSION` without the leading `v`, for example `0.1.0`):

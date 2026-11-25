@@ -75,6 +75,14 @@ scoop bucket add nizom333 https://github.com/nizom333/homebrew-tap
 scoop install nizom333/bdv
 ```
 
+### winget (Windows)
+
+```powershell
+winget install nizom333.bdv
+```
+
+Paket winget repozitoriyasiga yuborilgan ([microsoft/winget-pkgs#489168](https://github.com/microsoft/winget-pkgs/pull/489168)) va qabul qilingach mavjud bo'ladi. Ungacha Scoop'dan foydalaning.
+
 ### Debian, Ubuntu, Fedora, RHEL, Alpine
 
 Tizimingiz uchun paketni [soʻnggi reliz](https://github.com/nizom333/bdv/releases/latest) dan yuklab oling. Fayl nomlari (`VERSION` boshidagi `v` siz, masalan `0.1.0`):

@@ -36,3 +36,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAP_DEPLOY_KEY: ${{ secrets.TAP_DEPLOY_KEY }}
           AUR_KEY: ${{ secrets.AUR_KEY }}
+          WINGET_GITHUB_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}

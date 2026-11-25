@@ -16,7 +16,7 @@ A bdv release is a pushed annotated tag `vX.Y.Z` on `main`. Everything else is a
 | Repo | `nizom333/bdv`, branch `main` |
 | Tap | `nizom333/homebrew-tap`: cask `Casks/bdv.rb`, Scoop `bucket/bdv.json` |
 | Workflows | `ci.yml`, `release.yml` (on tag `v*`), `install-test.yml` (after Release) |
-| Secrets | `TAP_DEPLOY_KEY` (SSH deploy key, write access to the tap), `AUR_KEY` (optional; AUR upload is skipped when empty) |
+| Secrets | `TAP_DEPLOY_KEY` (SSH deploy key, write access to the tap), `AUR_KEY` (optional; AUR upload is skipped when empty), `WINGET_GITHUB_TOKEN` (optional classic PAT with `public_repo`; GoReleaser pushes manifests to the fork `nizom333/winget-pkgs` and opens a PR to `microsoft/winget-pkgs`; skipped when empty) |
 | Assets | `bdv_X.Y.Z_{darwin,linux}_{amd64,arm64}.tar.gz`, `bdv_X.Y.Z_windows_{amd64,arm64}.zip`, `bdv_X.Y.Z_{amd64,arm64}.deb`, `bdv-X.Y.Z-1.{x86_64,aarch64}.rpm`, `bdv_X.Y.Z_{x86_64,aarch64}.apk`, `checksums.txt` |
 
 Homebrew ships bdv as a **cask** (`Casks/bdv.rb`), not a formula: GoReleaser v2.16+ deprecates `brews`, and `goreleaser check` fails on it. Do not "fix" this by switching back to `brews`.
@@ -135,4 +135,5 @@ Then fix the problem on `main` and release `vX.Y.(Z+1)`. The deleted version num
 | Lightweight tag (`git tag v0.2.0`) | Always `git tag -a` |
 | Looking for `Formula/bdv.rb` in the tap | bdv is a cask: `Casks/bdv.rb` |
 | Treating a skipped AUR step as a failure | Expected while `AUR_KEY` is not set |
+| Treating a skipped winget step as a failure | Expected while `WINGET_GITHUB_TOKEN` is not set; without it, update winget by hand: a PR with the three manifests under `manifests/n/nizom333/bdv/<version>/` |
 | Bumping major for a breaking change before 1.0 | Pre-1.0 breaking changes bump the minor |
