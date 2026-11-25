@@ -1,0 +1,14 @@
+date,tag,asset,downloads
+2026-11-25,v0.1.0,bdv-0.1.0-1.aarch64.rpm,1
+2026-11-25,v0.1.0,bdv-0.1.0-1.x86_64.rpm,1
+2026-11-25,v0.1.0,bdv_0.1.0_aarch64.apk,1
+2026-11-25,v0.1.0,bdv_0.1.0_amd64.deb,2
+2026-11-25,v0.1.0,bdv_0.1.0_arm64.deb,1
+2026-11-25,v0.1.0,bdv_0.1.0_darwin_amd64.tar.gz,1
+2026-11-25,v0.1.0,bdv_0.1.0_darwin_arm64.tar.gz,4
+2026-11-25,v0.1.0,bdv_0.1.0_linux_amd64.tar.gz,3
+2026-11-25,v0.1.0,bdv_0.1.0_linux_arm64.tar.gz,1
+2026-11-25,v0.1.0,bdv_0.1.0_windows_amd64.zip,3
+2026-11-25,v0.1.0,bdv_0.1.0_windows_arm64.zip,1
+2026-11-25,v0.1.0,bdv_0.1.0_x86_64.apk,1
+2026-11-25,v0.1.0,checksums.txt,3
